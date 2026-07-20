@@ -33,14 +33,14 @@ Open-source Agent Skill for multi-dimension scoring of frontend UI, backend arch
 
 ```bash
 # 示例：克隆后安装到 Cursor（个人）
-git clone https://github.com/<your-org>/mskill.git
+git clone https://github.com/wei63w/mskill.git
 cp -r mskill/skills/grader ~/.cursor/skills/grader
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/<your-org>/mskill.git
+git clone https://github.com/wei63w/mskill.git
 Copy-Item -Recurse mskill\skills\grader $HOME\.cursor\skills\grader
 ```
 
