@@ -1,35 +1,38 @@
-# 评分卡 · security
+# Rubric · security
 
-安全相关打分（认证授权、注入、密钥、输入校验、敏感数据）。非渗透测试替代品；高风险项必须进 P0。
+**Category:** `security`  
+Security posture (read-only). Not a pentest. Confirmed high risk → **P0**. Never write exploit PoCs.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `authn` | 认证 | 14 | 会话/JWT/OAuth 使用是否稳妥；密钥轮换与过期 |
-| `authz` | 授权 | 16 | 是否每请求校验；IDOR；角色/权限模型 |
-| `injection` | 注入与 XSS | 14 | SQL/命令/模板注入；输出编码；危险 HTML |
-| `input_validation` | 输入校验 | 12 | 边界校验、白名单、文件上传限制 |
-| `secrets` | 密钥与配置 | 14 | 硬编码密钥；.env 入库；密钥管理 |
-| `sensitive_data` | 敏感数据 | 12 | PII/密码存储；日志脱敏；传输加密假设 |
-| `deps_supply` | 依赖与供应链 | 8 | 明显过时/已知漏洞依赖；锁文件 |
-| `security_headers` | 传输与头 | 10 | HTTPS 假设、CORS、CSRF、安全头（若适用） |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `authn` | Authentication | 14 | `mechanism`, `session_token_hygiene`, `expiry_rotation` |
+| `authz` | Authorization | 16 | `per_request`, `object_level`, `policy_model` |
+| `injection` | Injection & XSS | 14 | `query_safety`, `command_safety`, `output_encoding` |
+| `input_validation` | Input validation | 12 | `boundary_validation`, `allowlists`, `upload_safety` |
+| `secrets` | Secrets & config | 14 | `no_hardcode`, `injection_path`, `scanning` |
+| `sensitive_data` | Sensitive data | 12 | `storage`, `log_redaction`, `transport_assumptions` |
+| `deps_supply` | Dependencies | 8 | `lockfile`, `known_vuln_signal`, `update_practice` |
+| `security_headers` | Transport & headers | 10 | `cors`, `csrf`, `headers_tls` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点（摘要）
+## Evidence checklist
 
-- **0–3**：可利用的高危问题（未授权访问、注入、密钥泄露）
-- **4–6**：主路径有防护，对象级授权或校验缺口大
-- **7–8**：常见 Web/API 风险覆盖较好
-- **9–10**：纵深防御清晰，敏感路径有额外约束
+Auth middleware, object-level checks, SQL/HTML sinks, validators, `.env` samples, hashing, lockfiles, CORS/CSRF.
 
-### 分维提示
-- 发现明确高危漏洞：相关维度 ≤3，并在总评置顶
-- `secrets`：仓库内真实密钥直接低分，即使用户说是示例也要警告核实
-- 无法验证运行配置时标 N/A，不要假装评过 TLS 终端
+## Sub-criteria
 
-## 评测时注意
+| Dimension | Subs |
+|-----------|------|
+| `authn` | Sound mechanism; cookie/JWT hygiene; expiry/refresh/rotation |
+| `authz` | Enforced every request; IDOR resistance; RBAC/ABAC clarity |
+| `injection` | Parameterized queries; no unsafe shells; contextual output encoding |
+| `input_validation` | Server-side validation; allowlists; upload limits/type checks |
+| `secrets` | No live secrets in repo; env/manager injection; CI scanning |
+| `sensitive_data` | Password/PII handling; log redaction; TLS assumptions noted |
+| `deps_supply` | Lockfiles; obvious critical CVE age; update automation |
+| `security_headers` | CORS least privilege; CSRF for cookie sessions; security headers / TLS N/A if unverifiable |
 
-- 只做只读审查；不写 exploit PoC
-- 与 `backend-quality` 重叠时：安全后果放本卡，代码整洁度放质量卡
+**Rule:** concrete authz hole or live secret → affected subs ≤3 + top summary.

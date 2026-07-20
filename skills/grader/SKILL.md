@@ -1,86 +1,112 @@
 ---
 name: grader
 description: >-
-  Scores software artifacts across dimensions and produces a graded report with
-  strengths, weaknesses, and prioritized fixes. Use when the user mentions
-  grader, 打分, 评分, scorecard, 项目体检, audit UI, 评架构, 代码质量评估, 优缺点,
-  grade my UI, score backend architecture, or asks for a multi-dimension
-  quality score on frontend UI, backend architecture, backend quality,
-  frontend code, API design, security, database, testing, or devops.
+  Scores software artifacts with fine-grained rubrics (category → type →
+  dimension → sub-criterion) and produces graded reports with strengths,
+  weaknesses, and prioritized fixes. Use when the user mentions grader, 打分,
+  评分, scorecard, 项目体检, audit UI, 评架构, 代码质量, 无障碍, 前端性能,
+  动效, 微动画, UI创意, 用户接受度, motion, micro-interaction, resilience,
+  grade my UI, score backend, frontend-ux, frontend-a11y, frontend-motion, or
+  asks for multi-dimension quality scores on UI, UX, motion, creativity, a11y,
+  frontend code, performance, architecture, backend quality, resilience, API
+  design, security, database, testing, or devops.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.3.0"
   author: mskill
 ---
 
 # Grader
 
-按类型对开发产物多维度打分，输出总分、分项分、优点、缺点与可执行改进建议。
+Fine-grained scoring: **category → type → dimension → sub-criterion**.
+Emit totals, dimension scores, sub-scores, strengths, weaknesses, and P0–P2 fixes.
 
-## 工作流
+Rubrics are English. Reports follow [report-template.md](references/report-template.md)
+(Chinese structure; match the user’s language for prose).
 
-复制并跟踪：
+## Workflow
 
 ```
 Grader Progress:
-- [ ] 1. 确定类型与范围
-- [ ] 2. 加载对应评分卡
-- [ ] 3. 收集证据（读文件/结构）
-- [ ] 4. 按维度 0–10 打分并加权
-- [ ] 5. 输出报告（Markdown + YAML）
+- [ ] 1. Resolve category, type(s), and scope
+- [ ] 2. Load only matching rubric(s) + report template
+- [ ] 3. Gather evidence
+- [ ] 4. Score every sub-criterion (0–10), roll up to dimensions, then total
+- [ ] 5. Emit report (Markdown + YAML) including sub-scores
 ```
 
-### 1. 确定类型与范围
+### 1. Resolve category, type, scope
 
-从用户意图或路径推断类型 ID。无法判断时，先问一句再继续。
+Infer from user intent/paths. If unclear, ask **one** question: category or type.
 
-| 类型 ID | 何时使用 | 评分卡 |
-|---------|----------|--------|
-| `frontend-ui` | 页面/视觉/UX/落地页设计 | [frontend-ui.md](references/frontend-ui.md) |
-| `backend-architecture` | 分层、模块边界、系统结构 | [backend-architecture.md](references/backend-architecture.md) |
-| `backend-quality` | 后端实现质量、可维护性 | [backend-quality.md](references/backend-quality.md) |
-| `frontend-code` | 前端组件/状态/实现质量 | [frontend-code.md](references/frontend-code.md) |
-| `api-design` | HTTP/RPC 契约与 API 形态 | [api-design.md](references/api-design.md) |
-| `security` | 安全风险与防护 | [security.md](references/security.md) |
-| `database` | 模型、查询、迁移 | [database.md](references/database.md) |
-| `testing` | 测试策略与用例质量 | [testing.md](references/testing.md) |
-| `devops` | CI/CD、发布、配置 | [devops.md](references/devops.md) |
+#### Categories → types
 
-范围：用户指定的路径/文件；未指定则评与类型相关的核心目录，并在报告中写明范围。
+| Category | Type ID | Use when | Rubric |
+|----------|---------|----------|--------|
+| `frontend` | `frontend-ui` | Visual design, brand/hero, **UI creativity** | [frontend-ui.md](references/frontend-ui.md) |
+| `frontend` | `frontend-ux` | Flows, IA, responsive, **user acceptance** | [frontend-ux.md](references/frontend-ux.md) |
+| `frontend` | `frontend-motion` | Motion, micro-animations, motion acceptability | [frontend-motion.md](references/frontend-motion.md) |
+| `frontend` | `frontend-a11y` | Accessibility deep-dive | [frontend-a11y.md](references/frontend-a11y.md) |
+| `frontend` | `frontend-code` | Components, state, types, FE structure | [frontend-code.md](references/frontend-code.md) |
+| `frontend` | `frontend-performance` | Runtime/perf, bundle, rendering cost | [frontend-performance.md](references/frontend-performance.md) |
+| `backend` | `backend-architecture` | Boundaries, layering, cohesion, fit | [backend-architecture.md](references/backend-architecture.md) |
+| `backend` | `backend-quality` | Correctness, errors, complexity, BE tests | [backend-quality.md](references/backend-quality.md) |
+| `backend` | `backend-resilience` | Failure, degradation, observability design | [backend-resilience.md](references/backend-resilience.md) |
+| `backend` | `api-design` | HTTP/RPC/GraphQL contracts | [api-design.md](references/api-design.md) |
+| `security` | `security` | Authn/z, injection, secrets, data exposure | [security.md](references/security.md) |
+| `data` | `database` | Schema, queries, migrations | [database.md](references/database.md) |
+| `quality` | `testing` | Test strategy and case quality | [testing.md](references/testing.md) |
+| `ops` | `devops` | CI/CD, release, config, supply chain | [devops.md](references/devops.md) |
 
-全面体检：按仓库内容选 2–4 个最相关类型分别打分，再给一段综合总评（不虚构未评类型的分数）。
+**Routing aliases**
 
-### 2. 加载评分卡
+- “评 UI / 页面设计 / visual / UI创意” → `frontend-ui` (add `frontend-ux` / `frontend-motion` if also asked)
+- “评交互 / UX / 信息架构 / 用户接受度” → `frontend-ux`
+- “动效 / 微动画 / motion / micro-interaction” → `frontend-motion`
+- “无障碍 / a11y / accessibility” → `frontend-a11y`
+- “前端性能 / Core Web Vitals / jank” → `frontend-performance`
+- “页面综合观感” → often `frontend-ui` + `frontend-ux` + `frontend-motion`
+- “架构” → `backend-architecture` (add `backend-resilience` for reliability focus)
+- “后端质量 / code quality (BE)” → `backend-quality`
+- “全面体检 / full audit” → pick **one type per relevant category** (typically 3–5 types), score each separately, then synthesize. Never invent unscored types.
 
-只读取当前类型对应的 `references/*.md`，以及 [report-template.md](references/report-template.md)。不要一次加载全部评分卡。
+**Scope:** user paths/files, else core dirs for that type. State scope in the report.
 
-### 3. 收集证据
+### 2. Load rubric
 
-- 阅读相关源码、样式、配置、目录结构
-- 每个维度的分数必须能指向具体文件/符号/模式
-- 信息不足时该维标 `N/A`，说明假设；禁止假装评过
+Load only the active type’s file + report template. For multi-type checkups, load one rubric at a time.
 
-### 4. 打分规则
+### 3. Gather evidence
 
-- 每维度：**0–10**（整数或一位小数）
-- 使用评分卡中的权重计算加权平均，再映射到 **0–100** 总分：
-  `total = round(100 * Σ(score_i * weight_i) / Σ(weight_i))`（仅计入非 N/A 维度；权重按剩余维归一）
-- 等级：`S` ≥90 · `A` ≥80 · `B` ≥70 · `C` ≥60 · `D` <60
-- 锚点：0–3 差 · 4–6 中 · 7–8 良 · 9–10 优（以各评分卡细则为准）
-- 禁止空泛打分；禁止所有维度同分凑数
+- Read code, styles, configs, layout; prefer live UI preview when scoring UI/UX/a11y
+- Every **sub-criterion** needs a cite (file/symbol/pattern) or `N/A`
+- Never fake scores
 
-### 5. 输出报告
+### 4. Scoring model (fine-grained)
 
-严格按 [report-template.md](references/report-template.md) 输出：
+```
+sub-criterion (0–10)
+  → dimension = average of its non-N/A sub-criteria
+  → total/100 = weighted average of dimensions (rubric weights)
+  → grade S/A/B/C/D
+```
 
-1. Markdown 报告（总评 → 分数表 → 优点 → 缺点 → 改进清单）
-2. YAML `scorecard` 块
+Rules:
 
-改进建议分 **P0 / P1 / P2**，每条写清：改什么、为何、预期提分维度。
+- Sub-criterion and dimension: **0–10** (integer or one decimal)
+- `total = round(100 * Σ(dim_score * weight) / Σ(weight))` over non-N/A dimensions
+- If a dimension’s sub-criteria are all `N/A`, dimension is `N/A`
+- Grades: `S` ≥90 · `A` ≥80 · `B` ≥70 · `C` ≥60 · `D` <60
+- Bands: 0–3 poor · 4–6 fair · 7–8 good · 9–10 excellent
+- No flat identical scores across subs to “look balanced”
+- Blocking defects (authz hole, keyboard trap, data-loss risk): affected subs ≤3 and call out in summary
 
-## 原则
+### 5. Emit report
 
-- 证据优先，意见其次
-- 对标该类型评分卡，不混用其他类型维度
-- 语气直接、可执行；不吹捧、不恐吓
-- 工具无关：只依赖本 skill 的 markdown，不调用专有评分 API
+Follow [report-template.md](references/report-template.md): dimension table **and** sub-score breakdown + YAML with nested `subs`.
+
+## Principles
+
+- Evidence first; score only the active rubric
+- Prefer the finer type when the user names a narrow concern (don’t dump everything into `frontend-ui`)
+- Direct, actionable; no proprietary APIs; no exploit PoCs

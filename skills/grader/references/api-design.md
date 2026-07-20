@@ -1,35 +1,38 @@
-# 评分卡 · api-design
+# Rubric · api-design
 
-API / 接口契约设计打分（REST、RPC、GraphQL 等）。实现质量见 `backend-quality`。
+**Category:** `backend`  
+API/contract design. Implementation → `backend-quality`. Exploitability → `security`.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `resource_model` | 资源/模型清晰度 | 14 | 名词一致；资源边界清楚；避免RPC式乱命名冒充REST |
-| `naming` | 命名与风格 | 12 | 路径、字段、动词一致性；复数/嵌套约定 |
-| `contracts` | 请求响应契约 | 14 | schema 明确；必选/可选清楚；无文档黑洞 |
-| `errors` | 错误模型 | 14 | 状态码/错误码语义；可机读；客户端可行动 |
-| `versioning` | 版本与兼容 | 10 | 破坏性变更策略；兼容窗口 |
-| `idempotency` | 幂等与安全 | 12 | 写操作幂等；安全方法无副作用 |
-| `pagination_filter` | 列表与过滤 | 12 | 分页/排序/过滤一致、可预测 |
-| `authz_surface` | 鉴权面 | 12 | 认证方式清晰；权限边界在 API 层可表达 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `resource_model` | Resource/model clarity | 14 | `nouns`, `boundaries`, `graph_fit` |
+| `naming` | Naming & style | 12 | `paths`, `fields`, `conventions` |
+| `contracts` | Request/response contracts | 14 | `schema`, `required_optional`, `examples` |
+| `errors` | Error model | 14 | `shape`, `codes`, `actionability` |
+| `versioning` | Versioning & compatibility | 10 | `strategy`, `breaking_policy`, `deprecation` |
+| `idempotency` | Idempotency & safety | 12 | `safe_methods`, `write_keys`, `retry_semantics` |
+| `pagination_filter` | Lists & filtering | 12 | `pagination`, `sort`, `filter_grammar` |
+| `authz_surface` | Auth surface | 12 | `scheme_clarity`, `per_route`, `least_privilege` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点（摘要）
+## Evidence checklist
 
-- **0–3**：路径混乱、错误不可解析、无版本意识、写接口不安全
-- **4–6**：主资源可用，边缘约定漂移
-- **7–8**：契约一致，错误与分页可预期
-- **9–10**：契约一流，演进策略明确，客户端友好
+OpenAPI/proto/GraphQL schema, route tables, error middleware, auth requirements, list params, idempotency headers.
 
-### 分维提示
-- `errors`：一律 200 + 业务码可接受，但须文档化且一致；混用则降分
-- `idempotency`：支付/创建类缺幂等键应明显降分
-- `versioning`：内部-only API 可降低期望，但须在报告注明
+## Sub-criteria
 
-## 评测时注意
+| Dimension | Subs |
+|-----------|------|
+| `resource_model` | Consistent nouns; clear resource edges; GraphQL type-graph clarity |
+| `naming` | Predictable paths/fields; plural rules; one style |
+| `contracts` | Explicit schemas; required/optional clear; examples match reality |
+| `errors` | Stable envelope; meaningful codes; actionable, non-leaky |
+| `versioning` | Documented strategy; breaking-change rules; deprecation path |
+| `idempotency` | Safe GETs; critical writes idempotent; retry semantics documented |
+| `pagination_filter` | One list style; stable sort; documented filters |
+| `authz_surface` | Auth scheme clear; per-operation requirements; least privilege expressible |
 
-- 优先看 OpenAPI/proto、路由表、handler 签名与错误中间件
-- GraphQL：用同一维度，将 `resource_model` 理解为类型图清晰度
+**Note:** Always-200 + business code can score well if consistent and documented.

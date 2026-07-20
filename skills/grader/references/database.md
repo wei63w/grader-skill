@@ -1,34 +1,36 @@
-# 评分卡 · database
+# Rubric · database
 
-数据模型、查询、事务与迁移打分。
+**Category:** `data`  
+Schema, queries, transactions, migrations. NoSQL: map schema/indexing to collections & access patterns.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `schema` | 模型设计 | 16 | 规范化程度是否合适；约束、外键、枚举 |
-| `indexing` | 索引 | 14 | 热查询是否有合适索引；过度索引 |
-| `queries` | 查询质量 | 16 | N+1、全表扫、无用列、危险排序 |
-| `transactions` | 事务与一致性 | 14 | 事务边界；隔离级别意识；跨存储一致性 |
-| `migrations` | 迁移 | 14 | 可重复、可回滚/扩展策略；数据回填安全 |
-| `integrity` | 完整性 | 12 | 唯一约束、非空、校验；应用层重复校验是否互补 |
-| `ops` | 运维友好 | 14 | 备份/连接池/慢查询可观测；大表变更风险 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `schema` | Schema design | 16 | `modeling`, `constraints`, `relationship_clarity` |
+| `indexing` | Indexing | 14 | `hot_path_indexes`, `write_cost`, `over_index_risk` |
+| `queries` | Query quality | 16 | `n_plus_one`, `bounded_reads`, `select_discipline` |
+| `transactions` | Transactions | 14 | `boundaries`, `isolation_awareness`, `partial_failure` |
+| `migrations` | Migrations | 14 | `reproducible`, `expand_contract`, `backfill_safety` |
+| `integrity` | Integrity | 12 | `uniqueness`, `nullability`, `db_vs_app_rules` |
+| `ops` | Operational readiness | 14 | `pooling`, `slow_query_visibility`, `ddl_risk` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点（摘要）
+## Evidence checklist
 
-- **0–3**：无约束、明显 N+1、迁移不可重复、易丢数据
-- **4–6**：能用，热路径与迁移有风险
-- **7–8**：模型与索引合理，迁移规范
-- **9–10**：一致性与演进策略成熟，查询可解释
+Migrations/DDL, repositories/DAOs, indexes, multi-step writes, pool settings.
 
-### 分维提示
-- `queries`：ORM 懒加载导致 N+1 应具体指出文件
-- `migrations`：仅有「改生产库手册」无迁移历史 → 低分
-- NoSQL：维度仍适用，将 `indexing`/`schema` 映射到集合设计与访问模式
+## Sub-criteria
 
-## 评测时注意
+| Dimension | Subs |
+|-----------|------|
+| `schema` | Fit normalization; FKs/enums; clear entities |
+| `indexing` | Hot filters/FKs indexed; write overhead considered; no index spam |
+| `queries` | No clear N+1; lists paginated; avoid select-* abuse |
+| `transactions` | Correct multi-write boundaries; contention considered |
+| `migrations` | Repeatable history; safe expand/contract; locked-table caution |
+| `integrity` | Uniqueness/null/checks in DB where needed |
+| `ops` | Pool discipline; slow-query observability; large DDL risk managed |
 
-- 看 migration 目录、schema、repository/DAO、慢查询相关代码
-- 无真实流量数据时，对「可能慢」的判断要标注为风险而非已证实事故
+Without prod metrics, label perf claims as **risk**, not incidents.

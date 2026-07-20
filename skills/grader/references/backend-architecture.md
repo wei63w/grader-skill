@@ -1,74 +1,69 @@
-# 评分卡 · backend-architecture
+# Rubric · backend-architecture
 
-后端 / 服务端架构打分。评结构与边界，不深入逐行实现质量（那是 `backend-quality`）。
+**Category:** `backend`  
+Score **structure & boundaries**. Resilience/telemetry design depth → `backend-resilience`. Line quality → `backend-quality`.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `boundaries` | 边界清晰度 | 15 | 模块/包职责是否清楚；领域与基础设施是否混杂 |
-| `layering` | 分层与依赖方向 | 15 | 依赖是否单向（如 interface ← impl）；有无循环依赖 |
-| `cohesion` | 模块内聚 | 12 | 相关行为是否聚在一起；上帝模块/散弹修改 |
-| `extensibility` | 扩展点 | 12 | 新功能是否可在边界内扩展；有无合适抽象（不过度） |
-| `data_flow` | 数据流一致性 | 12 | 请求/事件/数据模型在边界间是否一致、可追踪 |
-| `failure` | 失败与降级 | 10 | 超时、重试、隔离、降级、幂等是否有架构位置 |
-| `observability` | 可观测性 | 12 | 日志/指标/追踪是否在架构层被考虑，而非事后打补丁 |
-| `fit` | 与业务匹配 | 12 | 复杂度是否匹配问题规模；有无过度设计或明显欠设计 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `boundaries` | Boundary clarity | 18 | `duty_clarity`, `domain_infra_split`, `crossing_discipline` |
+| `layering` | Layering & deps | 18 | `direction`, `cycles`, `seam_testability` |
+| `cohesion` | Module cohesion | 16 | `colocation`, `change_locality`, `god_module_risk` |
+| `extensibility` | Extension points | 16 | `right_seams`, `no_switchyard`, `abstraction_rent` |
+| `data_flow` | Data-flow consistency | 16 | `traceability`, `contract_stability`, `boundary_mapping` |
+| `fit` | Problem fit | 16 | `complexity_match`, `team_match`, `growth_headroom` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点
+## Evidence checklist
+
+Package map, entrypoints, import directions, adapters vs domain, ADRs/docs if any.
+
+## Sub-criteria
 
 ### boundaries
-- **0–3**：任意文件可依赖任意层；领域逻辑散落在 handler/SQL 中
-- **4–6**：有目录分区但边界可被随意穿越
-- **7–8**：核心边界明确，偶有泄漏
-- **9–10**：边界文档化或由结构强制；穿越需显式适配
+| Sub | Inspect |
+|-----|---------|
+| `duty_clarity` | One-sentence module duties |
+| `domain_infra_split` | Business rules not trapped in SQL/HTTP |
+| `crossing_discipline` | Crossings via explicit adapters |
 
 ### layering
-- **0–3**：循环依赖明显；基础设施反向依赖业务细节
-- **4–6**：大体分层，局部环或跨层调用
-- **7–8**：依赖方向正确，接口在合适位置
-- **9–10**：依赖图干净；测试可替换关键边界
+| Sub | Inspect |
+|-----|---------|
+| `direction` | Depend inward/on ports correctly |
+| `cycles` | No package cycles |
+| `seam_testability` | Critical seams replaceable in tests |
 
 ### cohesion
-- **0–3**：巨型 service；改一处牵全身
-- **4–6**：按技术层切分，业务概念分散
-- **7–8**：按能力/领域聚合，职责可述
-- **9–10**：模块叙事清晰，变更局部化
+| Sub | Inspect |
+|-----|---------|
+| `colocation` | Related behavior together |
+| `change_locality` | Features don’t shotgun the tree |
+| `god_module_risk` | No mega-services |
 
 ### extensibility
-- **0–3**：任何新需求都要改核心开关堆
-- **4–6**：能扩展但靠复制粘贴
-- **7–8**：有策略/端口/插件等合适扩展点
-- **9–10**：扩展自然且无无用抽象层
+| Sub | Inspect |
+|-----|---------|
+| `right_seams` | Strategy/ports where needed |
+| `no_switchyard` | New features don’t edit one central monster |
+| `abstraction_rent` | Abstractions pay for themselves |
 
 ### data_flow
-- **0–3**：隐式全局状态；DTO 随意变形无法追踪
-- **4–6**：主路径清楚，支线混乱
-- **7–8**：命令/查询/事件路径可读
-- **9–10**：端到端数据契约稳定，边界转换显式
-
-### failure
-- **0–3**：无超时/重试策略；故障级联
-- **4–6**：局部有 try/catch，无统一策略
-- **7–8**：关键依赖有超时、重试、熔断或等价物
-- **9–10**：失败模式设计完整，含降级与幂等
-
-### observability
-- **0–3**：难以判断系统在做什么；无关联 ID
-- **4–6**：有日志，缺结构化/指标/追踪
-- **7–8**：关键路径可排查；有基础指标
-- **9–10**：架构级约定（相关 ID、span、SLO 友好埋点）
+| Sub | Inspect |
+|-----|---------|
+| `traceability` | Follow one write end-to-end |
+| `contract_stability` | DTOs/events coherent |
+| `boundary_mapping` | Explicit translations at edges |
 
 ### fit
-- **0–3**：微服务/事件总线等与团队规模严重错配，或一团浆糊
-- **4–6**：能跑但成本/复杂度偏高或结构过简将崩
-- **7–8**：复杂度与问题匹配
-- **9–10**：简单处保持简单，复杂处有意设计
+| Sub | Inspect |
+|-----|---------|
+| `complexity_match` | Not under/over-designed |
+| `team_match` | Ops/cognitive load fits team |
+| `growth_headroom` | Structure survives near-term growth |
 
-## 评测时注意
+**Rule:** microservices ≠ automatic higher score than modular monolith.
 
-- 先看目录、入口、依赖关系、模块 README；再抽查跨边界调用
-- 单体与分布式用同一维度，按「是否匹配问题」评 `fit`，不预设微服务更高分
-- 无图/无文档时根据代码结构推断，并在总评中注明推断成分
+Timeouts/retries/health → score in `backend-resilience` when that type is active (mention cross-link only if both run).

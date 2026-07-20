@@ -1,74 +1,46 @@
-# 评分卡 · backend-quality
+# Rubric · backend-quality
 
-后端代码实现质量打分。评正确性与可维护性，不替代完整安全审计（见 `security`）或架构边界评审（见 `backend-architecture`）。
+**Category:** `backend`  
+Implementation quality. Architecture → `backend-architecture`. Security exploits → `security`. Resilience policies → `backend-resilience`.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `correctness` | 正确性与边界 | 18 | 业务规则、边界条件、空值/并发下行为是否可靠 |
-| `error_handling` | 错误处理 | 14 | 错误是否分类、上抛/转换是否合理；是否吞异常 |
-| `naming_structure` | 命名与结构 | 12 | 命名达意；函数/类型大小与职责 |
-| `complexity` | 重复与复杂度 | 12 | 重复逻辑、过深嵌套、难测的面条代码 |
-| `testing` | 测试充分度 | 14 | 关键路径是否有测试；断言是否有意义 |
-| `concurrency` | 并发与资源 | 10 | 竞态、泄漏、连接/文件/锁是否正确释放 |
-| `diagnostics` | 日志与诊断 | 10 | 日志级别、上下文、是否可据此排障 |
-| `consistency` | 风格一致性 | 10 | 项目内风格、错误模型、分层调用约定是否统一 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `correctness` | Correctness & edges | 20 | `happy_path`, `edge_cases`, `invariants` |
+| `error_handling` | Error handling | 16 | `classification`, `propagation`, `client_safety` |
+| `naming_structure` | Naming & structure | 12 | `names`, `function_size`, `abstraction_level` |
+| `complexity` | Duplication & complexity | 14 | `duplication`, `nesting`, `separations` |
+| `testing` | Test adequacy | 14 | `critical_coverage`, `assertion_strength`, `regression_value` |
+| `concurrency` | Concurrency & resources | 12 | `shared_state`, `lifecycle`, `race_risk` |
+| `diagnostics` | Diagnostics | 6 | `log_context`, `actionability` |
+| `consistency` | Style consistency | 6 | `idioms`, `error_model_unity` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点
+## Evidence checklist
 
-### correctness
-- **0–3**：明显错误或未处理关键边界
-- **4–6**：主路径可用，边缘情况脆弱
-- **7–8**：边界与校验到位，行为可预期
-- **9–10**：不变量清晰；失败模式也正确
+Sample ≥2 vertical slices (handler → domain → persistence); tests; logging; shared mutable state.
 
-### error_handling
-- **0–3**：吞异常或到处裸 panic；错误信息无用
-- **4–6**：有处理但不一致；调用方难区分错误类型
-- **7–8**：错误类型/码清晰，映射合理
-- **9–10**：错误可行动、可观测，无泄漏敏感细节
+## Sub-criteria
 
-### naming_structure
-- **0–3**：模糊命名；超长函数难读
-- **4–6**：大体可读，局部含糊
-- **7–8**：命名与结构帮助理解领域
-- **9–10**：读代码即文档；抽象层次稳定
+| Dimension | Subs |
+|-----------|------|
+| `correctness` | Main behavior correct; null/empty/limits handled; invariants held on failure too |
+| `error_handling` | Typed/classified errors; wrap/map sane; no secret leaks / swallowed catches |
+| `naming_structure` | Intention-revealing names; focused functions; stable layers of abstraction |
+| `complexity` | Controlled copy-paste; shallow control flow; I/O≠policy≠formatting mixed less |
+| `testing` | Critical paths tested; assertions meaningful; suite would catch regressions |
+| `concurrency` | Shared state disciplined; pools/files closed; races considered |
+| `diagnostics` | Contextual logs; failures locatable |
+| `consistency` | Project patterns applied evenly |
 
-### complexity
-- **0–3**：大量复制；嵌套/分支爆炸
-- **4–6**：可维护但气味明显
-- **7–8**：重复受控；复杂逻辑有拆分
-- **9–10**：简单性优先；复杂处有充分理由
+**Honest rule:** near-zero tests ⇒ low `testing` (+ P0/P1).
 
-### testing
-- **0–3**：无测试或测试不跑/全是快照无断言
-- **4–6**：有若干测试，关键分支缺口大
-- **7–8**：核心路径与重要边界有覆盖
-- **9–10**：测试设计良好，重构安全网可靠
+## Overlap
 
-### concurrency
-- **0–3**：明显竞态或资源泄漏
-- **4–6**：单线程假设下可用，并发未考虑
-- **7–8**：共享状态受控；资源生命周期清楚
-- **9–10**：并发模型显式且有测试或强约束
-
-### diagnostics
-- **0–3**：几乎无日志或日志即噪声
-- **4–6**：有打印，缺请求上下文
-- **7–8**：关键失败可定位
-- **9–10**：结构化、有关联，助快速排障
-
-### consistency
-- **0–3**：同一问题多种写法；风格打架
-- **4–6**：有约定但执行不均
-- **7–8**：项目内模式稳定
-- **9–10**：约定清晰且被一致遵守
-
-## 评测时注意
-
-- 抽样有代表性的模块（入口、领域逻辑、数据访问），勿只看生成的样板
-- 若几乎无测试，`testing` 应诚实给低分，并在 P0/P1 体现
-- 与架构问题重叠时：实现层放这里，结构层放到 `backend-architecture` 报告，避免重复扣同一分两次却不说明
+| Issue | Prefer |
+|-------|--------|
+| Logic in controllers | `backend-architecture` |
+| SQL injection | `security` |
+| Missing outbound timeouts | `backend-resilience` |

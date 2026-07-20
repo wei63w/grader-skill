@@ -1,88 +1,92 @@
-# 评分卡 · frontend-ui
+# Rubric · frontend-ui
 
-前端页面 / UI 设计打分。评视觉与交互体验，不评业务逻辑正确性（那是 `frontend-code`）。
+**Category:** `frontend`  
+Score **visual design + UI creativity** (hierarchy, type, space, color, consistency, brand, creative distinctiveness).  
+Flows/acceptance → `frontend-ux`. Motion/micro-animations → `frontend-motion`. A11y → `frontend-a11y`.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `visual_hierarchy` | 视觉层级 | 12 | 主次是否一眼可读；标题/正文/辅助信息对比是否足够 |
-| `typography` | 排版可读 | 10 | 字号阶梯、行高、字重、行长；避免默认系统堆叠无个性 |
-| `spacing_layout` | 间距与布局 | 12 | 节奏一致、留白有目的；非随意堆叠或过密 |
-| `color_contrast` | 色彩与对比 | 10 | 调色有意图；正文/控件对比度达标；避免无意义炫光 |
-| `interaction` | 交互反馈 | 10 | 悬停/焦点/加载/空态/错误态是否完整、可预期 |
-| `responsive` | 响应式 | 10 | 小屏与大屏都成立；非仅缩放桌面稿 |
-| `a11y` | 无障碍 | 8 | 语义、焦点、标签、键盘可达；对比与触控目标 |
-| `consistency` | 一致性 | 10 | 组件/间距/圆角/文案语气统一；贴近设计系统（若有） |
-| `ia` | 信息架构 | 8 | 任务路径清晰；首屏不堆次要信息 |
-| `brand_hero` | 品牌与首屏 | 10 | 品牌信号足够强；落地页首屏预算克制（品牌+一句主张+CTA+主视觉） |
+| ID | Dimension | Weight | Sub-criteria (equal avg) |
+|----|-----------|--------|---------------------------|
+| `visual_hierarchy` | Visual hierarchy | 14 | `focus_clarity`, `competition_control`, `scan_path` |
+| `typography` | Typography | 12 | `type_ramp`, `readability`, `type_choice` |
+| `spacing_layout` | Spacing & layout | 14 | `spacing_scale`, `alignment_grouping`, `section_rhythm` |
+| `color_contrast` | Color & contrast | 12 | `palette_intent`, `text_contrast`, `status_semantics` |
+| `consistency` | Consistency | 12 | `component_sameness`, `token_usage`, `copy_tone` |
+| `brand_hero` | Brand & first screen | 14 | `brand_signal`, `hero_budget`, `visual_anchor` |
+| `ui_creativity` | UI creativity | 22 | `originality`, `concept_fit`, `memorable_detail`, `anti_slop`, `craft_risk` |
 
-权重合计 100。
+Weights sum to 100.  
+**Dimension score** = average of non-N/A subs. **Total** = weighted dimensions.
 
-## 打分锚点
+## Evidence checklist
+
+- Page/layout shells, design tokens / theme / Tailwind config
+- Hero / primary screens; button & heading styles
+- Distinctive layout/composition choices vs template patterns
+- Prefer preview/screenshot; if code-only, state that in the summary
+
+## Sub-criteria & anchors
 
 ### visual_hierarchy
-- **0–3**：主次混乱，多个同等强调元素抢注意力
-- **4–6**：大致有层级，但标题/按钮/卡片权重接近
-- **7–8**：扫描路径清晰，焦点落在正确主行动
-- **9–10**：层级克制且有表现力，无需思考即可完成首要任务
+| Sub | 0–3 | 4–6 | 7–8 | 9–10 |
+|-----|-----|-----|-----|------|
+| `focus_clarity` | No primary focus | Weak primary | Clear primary action/title | Instant task focus |
+| `competition_control` | Many equal shouts | Some rivalry | Controlled secondary | Near-zero noise on critical path |
+| `scan_path` | Chaotic | Recoverable | Predictable F/Z scan | Effortless scan |
 
 ### typography
-- **0–3**：字号混乱或全文一种字重；难读
-- **4–6**：可读但阶梯弱，偏模板字体观感
-- **7–8**：阶梯明确，正文字号/行高舒适
-- **9–10**：字体选择有意图且服务内容，细节（字距/截断）到位
+| Sub | Inspect |
+|-----|---------|
+| `type_ramp` | Distinct size/weight steps for H1–body–meta |
+| `readability` | Body size, line-height, measure (~45–75ch) |
+| `type_choice` | Intentional faces; avoid unmotivated default stacks when brand matters |
 
 ### spacing_layout
-- **0–3**：挤成一团或大片空洞无结构
-- **4–6**：有网格意识但不统一（间距魔法数多）
-- **7–8**：间距尺度少而稳，区块节奏清楚
-- **9–10**：疏密服务叙事，对齐与分组几乎无噪音
+| Sub | Inspect |
+|-----|---------|
+| `spacing_scale` | Few stable steps (e.g. 4/8); few magic numbers |
+| `alignment_grouping` | Columns/baselines; related items grouped |
+| `section_rhythm` | Section padding cadence; not cramped or random voids |
 
 ### color_contrast
-- **0–3**：低对比、彩虹堆砌或纯平无层次
-- **4–6**：能用但品牌色/中性色关系弱
-- **7–8**：有明确色板，正文与控件对比合格
-- **9–10**：氛围与可读性兼得，状态色语义清楚
+| Sub | Inspect |
+|-----|---------|
+| `palette_intent` | Brand/neutrals related; not rainbow clutter |
+| `text_contrast` | Body/controls readable (aim WCAG-ish) |
+| `status_semantics` | Success/warn/danger distinct and consistent |
 
-### interaction
-- **0–3**：几乎无反馈；禁用/加载含糊
-- **4–6**：基础 hover，缺空态/错误态
-- **7–8**：关键路径反馈完整
-- **9–10**：微交互有目的、不吵；异常路径同样完整
-
-### responsive
-- **0–3**：小屏破裂或横向滚动灾难
-- **4–6**：能用但断点生硬、重排差
-- **7–8**：主要断点布局合理
-- **9–10**：各尺寸都像「为其设计」，触控与密度适配
-
-### a11y
-- **0–3**：无语义、无法键盘使用、对比差
-- **4–6**：部分标签，焦点样式弱
-- **7–8**：表单/按钮/链接可访问，焦点可见
-- **9–10**：landmark、活区、减少动效等考虑周全
+**Penalize:** unmotivated purple/glow slop; gray-on-gray controls.
 
 ### consistency
-- **0–3**：同角色控件样式各异
-- **4–6**：大体统一，细节漂移
-- **7–8**：组件与 token 使用稳定
-- **9–10**：像同一产品族；例外有理由
-
-### ia
-- **0–3**：用户找不到下一步；首屏信息过载
-- **4–6**：能完成任务但绕路
-- **7–8**：主路径短且标签清楚
-- **9–10**：信息优先级服务目标，次要内容后置得当
+| Sub | Inspect |
+|-----|---------|
+| `component_sameness` | Same-role controls look/behave alike |
+| `token_usage` | Shared radius/shadow/spacing tokens |
+| `copy_tone` | Voice consistent across UI chrome |
 
 ### brand_hero
-- **0–3**：去掉导航后无法辨认品牌；首屏杂乱
-- **4–6**：有 logo 但主张弱或首屏塞满次要块
-- **7–8**：品牌与主张清楚，CTA 明确
-- **9–10**：首屏是一个完整构图；主视觉有真实锚点（非空渐变凑数）
+| Sub | Inspect |
+|-----|---------|
+| `brand_signal` | Recognizable without nav |
+| `hero_budget` | Landing: brand + one claim + CTA + one dominant visual |
+| `visual_anchor` | Real product/place/context imagery—not empty gradient filler |
 
-## 评测时注意
+**Admin/tools:** reinterpret as product identity + workspace clarity (same subs).
 
-- 有页面文件/截图/运行预览时优先看实际呈现；仅有代码则据 JSX/CSS/设计 token 推断并注明
-- 避免奖励「AI 套版」审美：紫白渐变、无意义 glow、首屏卡片墙、徽章贴纸堆砌等应扣分
-- 若是后台/工具型 UI，`brand_hero` 改为评估「产品识别 + 工作区清晰度」，权重不变
+### ui_creativity
+Score **distinctive, fitting creativity**—not randomness or trend cosplay.
+
+| Sub | 0–3 | 4–6 | 7–8 | 9–10 |
+|-----|-----|-----|-----|------|
+| `originality` | Indistinguishable template | Mild variation | Clear point of view | Memorable visual idea |
+| `concept_fit` | Creativity fights the product job | Partially aligned | Serves brand/task | Concept amplifies meaning |
+| `memorable_detail` | None / generic stock | One weak flourish | 1–2 sticky details | Details people would recall |
+| `anti_slop` | AI-default look (purple gradients, glow piles, badge spam) | Some clichés | Mostly avoided | Fresh without gimmicks |
+| `craft_risk` | Chaos mistaken for creativity | Uneven experiment | Controlled boldness | Bold yet polished |
+
+**Do not** reward creativity that destroys hierarchy, contrast, or task completion—cap related subs and call it out under weaknesses.
+
+## Anti-patterns
+
+Card-wall heroes, badge sticker piles, competing H1-level claims, inconsistent radius/shadow systems, novelty that blocks the primary CTA.

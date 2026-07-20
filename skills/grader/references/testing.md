@@ -1,34 +1,36 @@
-# 评分卡 · testing
+# Rubric · testing
 
-测试策略与用例质量打分（不单看覆盖率数字）。
+**Category:** `quality`  
+Test strategy and case quality—not coverage % alone.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `strategy` | 策略与金字塔 | 14 | 单测/集成/E2E 比例是否合理 |
-| `critical_paths` | 关键路径覆盖 | 18 | 核心业务与回归风险是否被测到 |
-| `assertion_quality` | 断言质量 | 16 | 断言行为而非实现细节；有无无意义 expect |
-| `isolation` | 隔离与稳定 | 14 | 脆性问题（时间、顺序、网络）；夹具质量 |
-| `testdata` | 测试数据 | 10 | fixture/factory 是否清楚；有无隐式共享状态 |
-| `speed_feedback` | 速度与反馈 | 10 | 本地/CI 反馈是否可用；是否动不动全 E2E |
-| `bug_prevention` | 缺陷拦截力 | 18 | 测试能否拦住真实回归；有无仅快照装修 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `strategy` | Strategy & pyramid | 14 | `layer_balance`, `guidance`, `right_tool` |
+| `critical_paths` | Critical-path coverage | 18 | `core_flows`, `money_auth_data`, `edge_risks` |
+| `assertion_quality` | Assertion quality | 16 | `behavior_focus`, `oracle_strength`, `snapshot_discipline` |
+| `isolation` | Isolation & stability | 14 | `determinism`, `no_order_deps`, `network_control` |
+| `testdata` | Test data | 10 | `factories`, `minimal_data`, `no_shared_mut` |
+| `speed_feedback` | Speed & feedback | 10 | `unit_speed`, `ci_staging`, `local_loop` |
+| `bug_prevention` | Bug-prevention power | 18 | `regression_net`, `real_failure_modes`, `refactor_safety` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点（摘要）
+## Evidence checklist
 
-- **0–3**：无测试、全跳过、或只测无关工具函数
-- **4–6**：有测试但关键路径缺口大 / 易碎
-- **7–8**：关键路径有可靠测试，结构合理
-- **9–10**：策略清晰，断言强，反馈快，重构有安全感
+Runner config, sample unit/integration/E2E, CI test jobs, snapshot volume. If not executed, state **not executed**.
 
-### 分维提示
-- 高覆盖率 + 弱断言 ≠ 高分
-- 纯 E2E 无单测：`strategy` 与 `speed_feedback` 降分
-- 快照漫天且从不审阅：`assertion_quality` 降分
+## Sub-criteria
 
-## 评测时注意
+| Dimension | Subs |
+|-----------|------|
+| `strategy` | Sensible unit/integration/E2E mix; documented norms |
+| `critical_paths` | Core journeys covered; auth/payment/data-loss paths prioritized |
+| `assertion_quality` | Assert behavior; strong oracles; snapshots reviewed/rare |
+| `isolation` | Deterministic; no order dependence; controlled time/network |
+| `testdata` | Clear factories; minimal fixtures; no leaky globals |
+| `speed_feedback` | Fast unit layer; CI not only giant E2E |
+| `bug_prevention` | Would catch real regressions; not decorative |
 
-- 读测试配置、代表性用例、CI 中的 test job
-- 无法运行测试时根据代码静态评，并注明未执行
+High coverage + weak assertions ≠ high score.

@@ -1,34 +1,36 @@
-# 评分卡 · devops
+# Rubric · devops
 
-CI/CD、环境、发布与配置管理打分。
+**Category:** `ops`  
+CI/CD, environments, release, config, supply chain.
 
-## 权重与维度
+## Dimensions & weights
 
-| ID | 维度 | 权重 | 看什么 |
-|----|------|------|--------|
-| `ci` | 持续集成 | 16 | 是否在 PR 上跑测/构建/静态检查；失败是否阻断 |
-| `cd_release` | 发布与部署 | 14 | 部署是否可重复；环境晋级；人工门禁是否合理 |
-| `rollback` | 可回滚 | 14 | 回滚路径；迁移兼容；特性开关 |
-| `config_secrets` | 配置与密钥 | 16 | 配置与代码分离；密钥注入方式；环境差异管理 |
-| `environments` | 环境parity | 12 | dev/stage/prod 差异是否可控；基础设施即代码 |
-| `observability_ops` | 运行可观测 | 14 | 健康检查、告警、日志收集是否存在 |
-| `supply_chain` | 构建供应链 | 14 | 锁文件、镜像来源、最少权限、制品完整性 |
+| ID | Dimension | Weight | Sub-criteria |
+|----|-----------|--------|--------------|
+| `ci` | Continuous integration | 16 | `pr_checks`, `gating`, `feedback_speed` |
+| `cd_release` | Release & deploy | 14 | `repeatability`, `promotion`, `approvals` |
+| `rollback` | Rollback | 14 | `artifact_rollback`, `migration_compat`, `flags` |
+| `config_secrets` | Config & secrets | 16 | `separation`, `secret_injection`, `boot_validation` |
+| `environments` | Environment parity | 12 | `env_set`, `drift_control`, `iac` |
+| `observability_ops` | Runtime observability | 14 | `health`, `alerts`, `log_ship` |
+| `supply_chain` | Build supply chain | 14 | `lock_pin`, `image_provenance`, `ci_least_privilege` |
 
-权重合计 100。
+Weights sum to 100.
 
-## 打分锚点（摘要）
+## Evidence checklist
 
-- **0–3**：纯手工发布、无 CI、密钥进仓库、无法回滚
-- **4–6**：有基础 CI，发布仍脆弱
-- **7–8**：流水线可靠，配置与密钥管理得当
-- **9–10**：可重复、可回滚、可观测，供应链意识强
+Workflows, Docker/deploy/IaC, env samples, health/alerts, branch protection hints. Cloud IAM → `N/A` if invisible.
 
-### 分维提示
-- 只有 `build` 无 `test` 的 CI：`ci` 中等偏低
-- 「直接 push main 即生产」且无防护：`cd_release`/`rollback` 低分
-- IaC 缺失但流程文档清晰：可中等分，须注明风险
+## Sub-criteria
 
-## 评测时注意
+| Dimension | Subs |
+|-----------|------|
+| `ci` | Build+test+lint on PRs; failures block; useful speed/cache |
+| `cd_release` | Repeatable deploys; env promotion; sensible gates |
+| `rollback` | Prior artifact restore; compatible migrations; feature flags |
+| `config_secrets` | Config≠code; secrets via env/manager; config validated at boot |
+| `environments` | Dev/stage/prod exist; drift controlled; IaC or equivalent |
+| `observability_ops` | Health/ready; alerting; centralized logs |
+| `supply_chain` | Lockfiles; trusted bases; least-privilege CI identities |
 
-- 看 `.github/workflows`、GitLab CI、Dockerfile、deploy 脚本、IaC、密钥扫描结果（若有）
-- 云账号权限等不可见项标 N/A
+Build-without-test CI → mid/low `ci`. Ungated push-to-prod → low `cd_release`/`rollback`.
