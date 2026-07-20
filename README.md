@@ -33,15 +33,15 @@ Open-source Agent Skill for multi-dimension scoring of frontend UI, backend arch
 
 ```bash
 # 示例：克隆后安装到 Cursor（个人）
-git clone https://github.com/wei63w/grader.git
-cp -r grader/skills/grader ~/.cursor/skills/grader
+git clone https://github.com/wei63w/grader-skill.git
+cp -r grader-skill/skills/grader ~/.cursor/skills/grader
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/wei63w/grader.git
-Copy-Item -Recurse grader\skills\grader $HOME\.cursor\skills\grader
+git clone https://github.com/wei63w/grader-skill.git
+Copy-Item -Recurse grader-skill\skills\grader $HOME\.cursor\skills\grader
 ```
 
 ## 用法 / Usage
